@@ -7,7 +7,7 @@ class Command:
         self.command(*args)
 
 class Parser:
-    def __init__(self, commands: dict[str: Command]):
+    def __init__(self, commands: dict[str, Command]):
         self.commands = commands
         self.commands["help"] = Command(self.help, "Prints documentation of the function.")
 
@@ -43,9 +43,18 @@ class Parser:
         command = form_inputs[0]
         arguments = form_inputs[1:]
 
-        self.commands[command](*arguments)
+        return {command: arguments}
+    
+    def parse_run(self, inp):
+        parsed = self.parse(inp)
+        command = self.commands[list(parsed.keys())[0]]
+        arguments = list(parsed.values())[0]
+        returned_val = command(*arguments)
+        if returned_val is not None:
+            print(returned_val)
 
+# Testing
 if __name__ == "__main__":
     x = Parser({"say": Command(print, "Function \"Say\": \n\tUsage: say *args\n\tDescription: echoes whatever u say") })
-    x.parse("say hi \"how r u\"")
+    x.parse_run("say hi \"how r u\"")
     x.parse("help help")
